@@ -25,6 +25,9 @@ class Plant:
                 f"{self._show_calls} show"
             )
 
+        def display_shade(self) -> None:
+            print(f"{self._shade_calls} shade")
+
     def __init__(
         self, name: str, height: float, age: int, growth_rate: float = 0.8
     ) -> None:
