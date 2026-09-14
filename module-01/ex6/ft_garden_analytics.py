@@ -4,6 +4,7 @@ class Plant:
             self._grow_calls = 0
             self._age_calls = 0
             self._show_calls = 0
+            self._shade_calls = 0
 
         def record_grow(self) -> None:
             self._grow_calls += 1
@@ -13,6 +14,9 @@ class Plant:
 
         def record_show(self) -> None:
             self._show_calls += 1
+
+        def record_shade(self) -> None:
+            self._shade_calls += 1
 
         def display(self) -> None:
             print(
@@ -145,14 +149,13 @@ class Tree(Plant):
     ) -> None:
         super().__init__(name, height, age, growth_rate)
         self._trunk_diameter = trunk_diameter
-        self._shade_calls = 0
 
     def show(self) -> None:
         super().show()
         print(f" Trunk diameter: {round(self._trunk_diameter, 1)}cm")
 
     def produce_shade(self) -> None:
-        self._shade_calls += 1
+        self._statistics.record_shade()
         print(
             f"Tree {self._name} now produces a shade of "
             f"{round(self.get_height(), 1)}cm long and "
@@ -161,7 +164,7 @@ class Tree(Plant):
 
     def display_statistics(self) -> None:
         super().display_statistics()
-        print(f" {self._shade_calls} shade")
+        self._statistics.display_shade()
 
 
 class Vegetable(Plant):
@@ -196,13 +199,9 @@ def display_statistics(plant: Plant) -> None:
 def main() -> None:
     print("=== Garden statistics ===")
     print("=== Check year-old")
+    print("Is 30 days more than a year? " f"-> {Plant.is_older_than_year(30)}")
     print(
-        "Is 30 days more than a year? "
-        f"-> {Plant.is_older_than_year(30)}"
-    )
-    print(
-        "Is 400 days more than a year? "
-        f"-> {Plant.is_older_than_year(400)}"
+        "Is 400 days more than a year? " f"-> {Plant.is_older_than_year(400)}"
     )
 
     print()
