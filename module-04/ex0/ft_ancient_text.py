@@ -19,7 +19,7 @@ def main() -> None:
         print("---\n")
         print(content, end="")
         print("\n---")
-    except OSError as e:
+    except (OSError, UnicodeError) as e:
         print(f"Error opening file '{filename}': {e}")
     finally:
         if file_obj is not None:
