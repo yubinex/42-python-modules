@@ -15,8 +15,11 @@ def main() -> None:
     try:
         file_obj = open(filename, "r")
         content = file_obj.read()
-        lines = [line + "#\n" for line in content.splitlines()]
-        new_content = "".join(lines)
+        lines = content.splitlines(keepends=True)
+        new_content = "".join(
+            line[:-1] + "#\n" if line.endswith("\n") else line + "#"
+            for line in lines
+        )
 
         print("---\n")
         print(content, end="")
