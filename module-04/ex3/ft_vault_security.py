@@ -12,7 +12,7 @@ def secure_archive(
                 file.write(content)
                 return (True, "Content successfully written to file")
 
-    except OSError as e:
+    except (OSError, UnicodeError) as e:
         return (False, f"{e}")
 
 
@@ -26,7 +26,7 @@ if __name__ == "__main__":
     print(secure_archive("/etc/shadow"))
 
     print("\nUsing 'secure_archive' to read from a regular file:")
-    res = secure_archive("ft_vault_security.py")
+    res = secure_archive(__file__)
     print(res)
 
     print("\nUsing 'secure_archive' to write previous content to a new file:")
