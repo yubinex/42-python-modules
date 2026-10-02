@@ -24,7 +24,7 @@ def main() -> None:
         print("---\n")
         print(content, end="")
         print("\n---")
-    except OSError as e:
+    except (OSError, UnicodeError) as e:
         print(f"Error opening file '{filename}': {e}")
         return
     finally:
@@ -47,6 +47,8 @@ def main() -> None:
         print(f"Saving data to '{new_filename}'")
         file_obj = open(new_filename, "w")
         file_obj.write(new_content)
+        file_obj.close()
+        file_obj = None
         print(f"Data saved in file '{new_filename}'.")
     except (OSError, UnicodeError) as e:
         print(f"Error writing to file '{new_filename}': {e}")
