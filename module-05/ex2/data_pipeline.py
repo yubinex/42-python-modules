@@ -151,16 +151,45 @@ class DataStream:
 class CSVPlugin:
     def process_output(self, data: list[tuple[int, str]]) -> None:
         print("CSV Output:")
-        print(",".join(value for _, value in data))
+        print(",".join(_escape_csv(value) for _, value in data))
 
 
 class JSONPlugin:
     def process_output(self, data: list[tuple[int, str]]) -> None:
         print("JSON Output:")
         properties = ", ".join(
-            f'"item_{rank}": "{value}"' for rank, value in data
+            f'"item_{rank}": "{_escape_json(value)}"'
+            for rank, value in data
         )
         print("{" + properties + "}")
+
+
+def _escape_csv(value: str) -> str:
+    return '"' + value.replace('"', '""') + '"'
+
+
+def _escape_json(value: str) -> str:
+    escaped = ""
+    for char in value:
+        if char == '"':
+            escaped += '\\"'
+        elif char == "\\":
+            escaped += "\\\\"
+        elif char == "\n":
+            escaped += "\\n"
+        elif char == "\r":
+            escaped += "\\r"
+        elif char == "\t":
+            escaped += "\\t"
+        elif char == "\b":
+            escaped += "\\b"
+        elif char == "\f":
+            escaped += "\\f"
+        elif ord(char) < 32:
+            escaped += f"\\u{ord(char):04x}"
+        else:
+            escaped += char
+    return escaped
 
 
 def main() -> None:
