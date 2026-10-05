@@ -1,0 +1,10 @@
+# Real configuration with secrets
+.env
+
+# Virtual environments
+matrix_env/
+.venv/
+
+# Python caches
+__pycache__/
+.mypy_cache/
