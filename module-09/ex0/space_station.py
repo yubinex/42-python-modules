@@ -41,7 +41,7 @@ def main() -> None:
     status = (
         "Operational" if valid_station.is_operational else "Not operational"
     )
-    print(f"Status: {status}")
+    print(f"Status: {status}\n")
 
     print("=" * 40)
     print("Expected validation error:")
