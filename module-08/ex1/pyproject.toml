@@ -1,0 +1,22 @@
+[project]
+name = "matrix-loading"
+version = "0.1.0"
+description = "Matrix data analysis to compare pip and Poetry"
+authors = [{ name = "jhauck", email = "jhauck@student.42heilbronn.de" }]
+requires-python = ">=3.10"
+dependencies = [
+	"numpy (>=1.24,<2.0)",
+	"pandas (>=2.0,<3.0)",
+	"matplotlib (>=3.7,<4.0)",
+]
+
+[tool.poetry]
+package-mode = false
+
+[tool.poetry.group.dev.dependencies]
+flake8 = ">=6.0"
+mypy = ">=1.0"
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
