@@ -10,6 +10,7 @@ import sys
 
 try:
     from dotenv import load_dotenv  # type: ignore[import-not-found]
+
     DOTENV_AVAILABLE = True
 except ImportError:
     DOTENV_AVAILABLE = False
@@ -39,19 +40,24 @@ def get_mode(config: dict[str, str]) -> str:
     """Return the mode (development by default), stop if it is invalid."""
     mode = config["MATRIX_MODE"] or "development"
     if mode not in ("development", "production"):
-        print(f"ERROR: MATRIX_MODE must be development or production, "
-              f"not '{mode}'")
+        print(
+            f"ERROR: MATRIX_MODE must be development or production, "
+            f"not '{mode}'"
+        )
         sys.exit(1)
     return mode
 
 
 def check_missing(config: dict[str, str], mode: str) -> None:
     """Warn about missing settings, or stop if running in production."""
-    missing = [key for key in CONFIG_KEYS
-               if key != "MATRIX_MODE" and not config[key]]
+    missing = [
+        key for key in CONFIG_KEYS if key != "MATRIX_MODE" and not config[key]
+    ]
     if missing and mode == "production":
-        print(f"ERROR: production needs every setting, missing: "
-              f"{', '.join(missing)}")
+        print(
+            f"ERROR: production needs every setting, missing: "
+            f"{', '.join(missing)}"
+        )
         sys.exit(1)
     for key in missing:
         print(f"WARNING: {key} not set")
@@ -83,7 +89,7 @@ def env_is_gitignored() -> bool:
     try:
         with open(GITIGNORE_FILE, encoding="utf-8") as gitignore:
             return ".env" in [line.strip() for line in gitignore]
-    except OSError:
+    except (OSError, UnicodeError):
         return False
 
 
