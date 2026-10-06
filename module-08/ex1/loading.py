@@ -41,29 +41,9 @@ def check_dependencies() -> dict[str, str | None]:
     return versions
 
 
-def detect_manager() -> str:
-    """Tell which tool created the environment running this script.
-
-    Every venv has a pyvenv.cfg that records the command that created it.
-    Poetry builds its venvs with its own Python, so "poetry" shows up
-    there, wherever the venv is stored.
-    """
-    if sys.prefix == sys.base_prefix:
-        return "none (global Python)"
-    try:
-        with open(f"{sys.prefix}/pyvenv.cfg") as cfg:
-            created_by_poetry = "poetry" in cfg.read().lower()
-    except OSError:
-        created_by_poetry = False
-    if created_by_poetry:
-        return "Poetry"
-    return "pip (manual virtual environment)"
-
-
 def compare_managers(versions: dict[str, str | None]) -> None:
     """Show installed versions and how pip and Poetry differ."""
     print("\nPackage manager comparison:")
-    print(f"Active environment manager: {detect_manager()}")
     print(f"Environment path: {sys.prefix}")
     for package, version in versions.items():
         print(f"  {package:<12} {version or 'not installed'}")
