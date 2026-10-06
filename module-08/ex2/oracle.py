@@ -9,11 +9,14 @@ import os
 import sys
 
 try:
-    from dotenv import load_dotenv
+    from dotenv import load_dotenv  # type: ignore[import-not-found]
     DOTENV_AVAILABLE = True
 except ImportError:
     DOTENV_AVAILABLE = False
 
+SCRIPT_DIRECTORY = os.path.dirname(os.path.abspath(__file__))
+ENV_FILE = os.path.join(SCRIPT_DIRECTORY, ".env")
+GITIGNORE_FILE = os.path.join(SCRIPT_DIRECTORY, ".gitignore")
 CONFIG_KEYS = [
     "MATRIX_MODE",
     "DATABASE_URL",
@@ -26,7 +29,7 @@ CONFIG_KEYS = [
 def load_config() -> dict[str, str]:
     """Load the .env file, then read every setting from the environment."""
     if DOTENV_AVAILABLE:
-        load_dotenv(".env")
+        load_dotenv(ENV_FILE)
     else:
         print("WARNING: python-dotenv not installed, .env file ignored\n")
     return {key: os.environ.get(key, "") for key in CONFIG_KEYS}
@@ -78,7 +81,7 @@ def show_config(config: dict[str, str], mode: str) -> None:
 def env_is_gitignored() -> bool:
     """Return True if .gitignore keeps the .env file out of git."""
     try:
-        with open(".gitignore") as gitignore:
+        with open(GITIGNORE_FILE, encoding="utf-8") as gitignore:
             return ".env" in [line.strip() for line in gitignore]
     except OSError:
         return False
@@ -91,7 +94,7 @@ def security_check(config: dict[str, str], shell_keys: list[str]) -> None:
         print("[WARNING] API_KEY is still the placeholder from .env.example")
     else:
         print("[OK] No hardcoded secrets detected")
-    if not os.path.isfile(".env"):
+    if not os.path.isfile(ENV_FILE):
         print("[WARNING] No .env file found (cp .env.example .env)")
     elif not env_is_gitignored():
         print("[WARNING] .env is not in .gitignore, secrets could leak")

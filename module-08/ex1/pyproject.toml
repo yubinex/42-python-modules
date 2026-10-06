@@ -5,9 +5,9 @@ description = "Matrix data analysis to compare pip and Poetry"
 authors = [{ name = "jhauck", email = "jhauck@student.42heilbronn.de" }]
 requires-python = ">=3.10"
 dependencies = [
-	"numpy (>=1.24,<2.0)",
-	"pandas (>=2.0,<3.0)",
-	"matplotlib (>=3.7,<4.0)",
+	"numpy (>=1.24)",
+	"pandas (>=2.0)",
+	"matplotlib (>=3.7)",
 ]
 
 [tool.poetry]
