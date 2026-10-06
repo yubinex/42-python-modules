@@ -42,10 +42,20 @@ def check_dependencies() -> dict[str, str | None]:
 
 
 def detect_manager() -> str:
-    """Guess which tool manages the environment running this script."""
+    """Tell which tool created the environment running this script.
+
+    Every venv has a pyvenv.cfg that records the command that created it.
+    Poetry builds its venvs with its own Python, so "poetry" shows up
+    there, wherever the venv is stored.
+    """
     if sys.prefix == sys.base_prefix:
         return "none (global Python)"
-    if "pypoetry" in sys.prefix:
+    try:
+        with open(f"{sys.prefix}/pyvenv.cfg") as cfg:
+            created_by_poetry = "poetry" in cfg.read().lower()
+    except OSError:
+        created_by_poetry = False
+    if created_by_poetry:
         return "Poetry"
     return "pip (manual virtual environment)"
 
@@ -90,8 +100,6 @@ def run_analysis() -> None:
 
     # 2. Analyze: flag unusually strong signals as anomalies (pandas)
     data["anomaly"] = data["signal"] > 80
-    print(f"Average signal: {data['signal'].mean():.2f}")
-    print(f"Anomalies detected: {data['anomaly'].sum()}")
 
     # 3. Visualize: plot the signal and save it as an image (matplotlib)
     print("Generating visualization...")
@@ -104,6 +112,8 @@ def run_analysis() -> None:
         sys.exit(1)
     print("\nAnalysis complete!")
     print(f"Results saved to: {OUTPUT_FILE}")
+    print(f"\nAverage signal: {data['signal'].mean():.2f}")
+    print(f"Anomalies detected: {data['anomaly'].sum()}")
 
 
 def main() -> None:
@@ -113,8 +123,8 @@ def main() -> None:
     if None in versions.values():
         show_install_help()
         sys.exit(1)
-    compare_managers(versions)
     run_analysis()
+    compare_managers(versions)
 
 
 if __name__ == "__main__":

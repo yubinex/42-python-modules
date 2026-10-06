@@ -2,7 +2,7 @@
 
 Values come from a .env file, but variables set in the shell always win.
 Development mode tolerates missing settings, production mode refuses to
-start without them and hides the database URL.
+start without them.
 """
 
 import os
@@ -57,36 +57,60 @@ def check_missing(config: dict[str, str], mode: str) -> None:
 
 
 def show_config(config: dict[str, str], mode: str) -> None:
-    """Print the settings, hiding the database URL in production."""
-    database = config["DATABASE_URL"] or "not set"
-    if mode == "production":
-        database = "[hidden in production]"
+    """Print the status of each setting without revealing its value."""
+    url = config["DATABASE_URL"]
+    if not url:
+        database = "Not configured"
+    elif any(local in url for local in ("sqlite", "localhost", "127.0.0.1")):
+        database = "Connected to local instance"
+    else:
+        database = "Connected to remote instance"
+    api = "Authenticated" if config["API_KEY"] else "Not authenticated"
+    zion = "Online" if config["ZION_ENDPOINT"] else "Offline"
     print("Configuration loaded:")
     print(f"Mode: {mode}")
     print(f"Database: {database}")
-    print(f"API Access: {'Authenticated' if config['API_KEY'] else 'No key'}")
+    print(f"API Access: {api}")
     print(f"Log Level: {config['LOG_LEVEL'] or 'not set'}")
-    print(f"Zion Network: {config['ZION_ENDPOINT'] or 'not set'}")
+    print(f"Zion Network: {zion}")
 
 
-def security_check() -> None:
-    """Report where the secrets come from."""
+def env_is_gitignored() -> bool:
+    """Return True if .gitignore keeps the .env file out of git."""
+    try:
+        with open(".gitignore") as gitignore:
+            return ".env" in [line.strip() for line in gitignore]
+    except OSError:
+        return False
+
+
+def security_check(config: dict[str, str], shell_keys: list[str]) -> None:
+    """Check the API key, the .env file and the shell overrides."""
     print("\nEnvironment security check:")
-    print("[OK] No hardcoded secrets detected")
-    if os.path.isfile(".env"):
-        print("[OK] .env file found")
+    if config["API_KEY"] == "your-api-key-here":
+        print("[WARNING] API_KEY is still the placeholder from .env.example")
     else:
+        print("[OK] No hardcoded secrets detected")
+    if not os.path.isfile(".env"):
         print("[WARNING] No .env file found (cp .env.example .env)")
+    elif not env_is_gitignored():
+        print("[WARNING] .env is not in .gitignore, secrets could leak")
+    else:
+        print("[OK] .env file properly configured")
+    # load_dotenv never replaces variables already set in the shell
+    overrides = f" (active: {', '.join(shell_keys)})" if shell_keys else ""
+    print(f"[OK] Production overrides available{overrides}")
 
 
 def main() -> None:
     """Load, check and display the Matrix configuration."""
     print("ORACLE STATUS: Reading the Matrix...\n")
+    shell_keys = [key for key in CONFIG_KEYS if key in os.environ]
     config = load_config()
     mode = get_mode(config)
     check_missing(config, mode)
     show_config(config, mode)
-    security_check()
+    security_check(config, shell_keys)
     print("\nThe Oracle sees all configurations.")
 
 
