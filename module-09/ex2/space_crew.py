@@ -139,7 +139,7 @@ def main() -> None:
             budget_millions=100.0,
         )
     except ValidationError as error:
-        print(error.errors()[0]["msg"])
+        print(error.errors()[0]["msg"].removeprefix("Value error, "))
 
 
 if __name__ == "__main__":

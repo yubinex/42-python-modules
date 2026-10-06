@@ -91,7 +91,7 @@ def main() -> None:
             witness_count=2,
         )
     except ValidationError as error:
-        print(error.errors()[0]["msg"])
+        print(error.errors()[0]["msg"].removeprefix("Value error, "))
 
 
 if __name__ == "__main__":
